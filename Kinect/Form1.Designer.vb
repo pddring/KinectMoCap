@@ -30,6 +30,11 @@ Partial Class Form1
         Me.GroupBox3 = New System.Windows.Forms.GroupBox()
         Me.picIR = New System.Windows.Forms.PictureBox()
         Me.groupBody = New System.Windows.Forms.GroupBox()
+        Me.lblCoordinates = New System.Windows.Forms.Label()
+        Me.Label1 = New System.Windows.Forms.Label()
+        Me.txtBoneSize = New System.Windows.Forms.TextBox()
+        Me.btnDisconnect = New System.Windows.Forms.Button()
+        Me.lstJoints = New System.Windows.Forms.ListBox()
         Me.GroupBox1.SuspendLayout()
         CType(Me.picDepth, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.GroupBox2.SuspendLayout()
@@ -40,7 +45,7 @@ Partial Class Form1
         '
         'btnTest
         '
-        Me.btnTest.Location = New System.Drawing.Point(27, 151)
+        Me.btnTest.Location = New System.Drawing.Point(45, 86)
         Me.btnTest.Name = "btnTest"
         Me.btnTest.Size = New System.Drawing.Size(148, 52)
         Me.btnTest.TabIndex = 0
@@ -116,17 +121,66 @@ Partial Class Form1
         Me.groupBody.TabStop = False
         Me.groupBody.Text = "Body"
         '
+        'lblCoordinates
+        '
+        Me.lblCoordinates.AutoSize = True
+        Me.lblCoordinates.Location = New System.Drawing.Point(25, 38)
+        Me.lblCoordinates.Name = "lblCoordinates"
+        Me.lblCoordinates.Size = New System.Drawing.Size(69, 13)
+        Me.lblCoordinates.TabIndex = 6
+        Me.lblCoordinates.Text = "Coordinates: "
+        '
+        'Label1
+        '
+        Me.Label1.AutoSize = True
+        Me.Label1.Location = New System.Drawing.Point(42, 261)
+        Me.Label1.Name = "Label1"
+        Me.Label1.Size = New System.Drawing.Size(58, 13)
+        Me.Label1.TabIndex = 7
+        Me.Label1.Text = "Bone Size:"
+        '
+        'txtBoneSize
+        '
+        Me.txtBoneSize.Location = New System.Drawing.Point(38, 289)
+        Me.txtBoneSize.Name = "txtBoneSize"
+        Me.txtBoneSize.Size = New System.Drawing.Size(136, 20)
+        Me.txtBoneSize.TabIndex = 8
+        Me.txtBoneSize.Text = "0.1"
+        '
+        'btnDisconnect
+        '
+        Me.btnDisconnect.Location = New System.Drawing.Point(45, 144)
+        Me.btnDisconnect.Name = "btnDisconnect"
+        Me.btnDisconnect.Size = New System.Drawing.Size(148, 52)
+        Me.btnDisconnect.TabIndex = 9
+        Me.btnDisconnect.Text = "Disconnect"
+        Me.btnDisconnect.UseVisualStyleBackColor = True
+        '
+        'lstJoints
+        '
+        Me.lstJoints.FormattingEnabled = True
+        Me.lstJoints.Location = New System.Drawing.Point(30, 322)
+        Me.lstJoints.Name = "lstJoints"
+        Me.lstJoints.Size = New System.Drawing.Size(172, 108)
+        Me.lstJoints.TabIndex = 10
+        '
         'Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(800, 450)
+        Me.Controls.Add(Me.lstJoints)
+        Me.Controls.Add(Me.btnDisconnect)
+        Me.Controls.Add(Me.txtBoneSize)
+        Me.Controls.Add(Me.Label1)
+        Me.Controls.Add(Me.lblCoordinates)
         Me.Controls.Add(Me.groupBody)
         Me.Controls.Add(Me.GroupBox3)
         Me.Controls.Add(Me.GroupBox2)
         Me.Controls.Add(Me.GroupBox1)
         Me.Controls.Add(Me.btnTest)
         Me.DoubleBuffered = True
+        Me.KeyPreview = True
         Me.Name = "Form1"
         Me.Text = "Kinect Test"
         Me.GroupBox1.ResumeLayout(False)
@@ -136,6 +190,7 @@ Partial Class Form1
         Me.GroupBox3.ResumeLayout(False)
         CType(Me.picIR, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
+        Me.PerformLayout()
 
     End Sub
 
@@ -147,4 +202,9 @@ Partial Class Form1
     Friend WithEvents GroupBox3 As GroupBox
     Friend WithEvents picIR As PictureBox
     Friend WithEvents groupBody As GroupBox
+    Friend WithEvents lblCoordinates As Label
+    Friend WithEvents Label1 As Label
+    Friend WithEvents txtBoneSize As TextBox
+    Friend WithEvents btnDisconnect As Button
+    Friend WithEvents lstJoints As ListBox
 End Class

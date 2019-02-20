@@ -17,7 +17,11 @@ Public Class Form1
     Dim bmpDepth As Bitmap = Nothing
     Dim bmpIR As Bitmap = Nothing
 
+    Dim bodies() As Body
 
+    Dim bonesize As Double = 0.1
+
+    Dim colors() As Color = {Color.Red, Color.Blue, Color.Yellow, Color.Violet, Color.Green, Color.Gold}
 
     Dim glControl As OpenGL.GlControl
 
@@ -50,7 +54,6 @@ Public Class Form1
         kSensor.Open()
     End Sub
 
-    Dim trackedJoints As New List(Of Joint)
 
     Private Sub BodyFrameHandler(sender As Object, e As BodyFrameArrivedEventArgs)
         Using frame As BodyFrame = e.FrameReference.AcquireFrame
@@ -59,23 +62,33 @@ Public Class Form1
                 Exit Sub
             End If
 
-            Dim bodies() As Body = New Body(frame.BodyCount - 1) {}
+            If IsNothing(bodies) Then
+                bodies = New Body(frame.BodyCount - 1) {}
+            End If
             frame.GetAndRefreshBodyData(bodies)
-
 
             glControl.Invalidate()
 
+            Dim title As String = "Bodies: " & frame.BodyCount & " "
 
-            trackedJoints.Clear()
+            For i = 0 To bodies.Count - 1
 
-            For Each joint In bodies(0).Joints
-                If joint.Value.TrackingState = TrackingState.Tracked Then
-                    trackedJoints.Add(joint.Value)
-                End If
+                Dim total As Integer = 0
+                For Each joint In bodies(i).Joints
+
+                    If joint.Value.TrackingState = TrackingState.Tracked Then
+                        total += 1
+                    End If
+                    If Not lstJoints.Items.Contains(joint.Key) Then
+                        lstJoints.Items.Add(joint.Key)
+                    End If
+
+                Next
+                title &= total & " "
             Next
 
-            groupBody.Text = "Bodies: " & frame.BodyCount & ", " & trackedJoints.Count & " joints"
 
+            groupBody.Text = title
 
         End Using
     End Sub
@@ -154,8 +167,16 @@ Public Class Form1
         End Using
     End Sub
 
-    Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+    Dim x As Double = -0.5
+    Dim y As Double = 0
+    Dim z As Double = -4
 
+    Sub updateCoordinates()
+        lblCoordinates.Text = x & ", " & y & ", " & z
+    End Sub
+
+    Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        updateCoordinates()
     End Sub
 
     Private Sub Form1_Shown(sender As Object, e As EventArgs) Handles MyBase.Shown
@@ -163,31 +184,125 @@ Public Class Form1
         groupBody.Controls.Add(glControl)
         glControl.Dock = DockStyle.Fill
         AddHandler glControl.Render, AddressOf GLRender
-        AddHandler glControl.ContextCreated, AddressOf GLContextCreated
     End Sub
 
-    Private Sub GLContextCreated(sender As Object, e As GlControlEventArgs)
-        Gl.MatrixMode(MatrixMode.Projection)
-        Gl.LoadIdentity()
-        Gl.Ortho(0, 1, 0, 1, 0, 1)
-        Gl.MatrixMode(MatrixMode.Modelview)
-        Gl.LoadIdentity()
+    Private Sub c(body As Body, j1 As JointType, j2 As JointType)
+        If body.Joints(j1).TrackingState <> TrackingState.NotTracked And body.Joints(j2).TrackingState <> TrackingState.NotTracked Then
+            Gl.Begin(PrimitiveType.Lines)
+            Gl.Vertex3(body.Joints(j1).Position.X, body.Joints(j1).Position.Y, body.Joints(j1).Position.Z)
+            Gl.Vertex3(body.Joints(j2).Position.X, body.Joints(j2).Position.Y, body.Joints(j2).Position.Z)
+            Gl.End()
+        End If
     End Sub
+
 
     Private Sub GLRender(sender As Object, e As GlControlEventArgs)
-        Gl.VB.Viewport(0, 0, glControl.Width, glControl.Height)
-        Gl.VB.Clear(ClearBufferMask.ColorBufferBit)
         Dim currentViewport As Integer() = New Integer(3) {0, 0, 0, 0}
         Gl.Get(Gl.VBEnum.VIEWPORT, currentViewport)
 
-        Gl.Begin(PrimitiveType.Lines)
+        Gl.VB.Viewport(0, 0, glControl.Width, glControl.Height)
+        Gl.VB.Clear(ClearBufferMask.ColorBufferBit)
 
+        Gl.MatrixMode(MatrixMode.Projection)
+        Gl.LoadIdentity()
+        Dim aspect As Double = glControl.Height / glControl.Width
+        Dim fieldOfView As Double = 45.0
+        Dim zNear As Double = 0.01
+        Dim zFar As Double = 1000.0F
+        Dim fH As Double = Math.Tan(fieldOfView * 3.14159F / 360.0F) * zNear
+        Dim fW As Double = fH * aspect
+        Gl.Frustum(-fW, fW, -fH, fH, zNear, zFar)
+
+        Gl.Translate(x, y, z)
+
+        Dim bodyCount As Integer = 0
+        If Not IsNothing(bodies) Then
+            For Each body In bodies
+
+                For Each joint In body.Joints
+                    Gl.Begin(PrimitiveType.Triangles)
+
+                    Gl.Color3(colors(bodyCount).R, colors(bodyCount).G, colors(bodyCount).B)
+                    Gl.Vertex3(joint.Value.Position.X, joint.Value.Position.Y, joint.Value.Position.Z)
+                    Gl.Vertex3(joint.Value.Position.X, joint.Value.Position.Y + bonesize, joint.Value.Position.Z)
+                    Gl.Vertex3(joint.Value.Position.X, joint.Value.Position.Y + bonesize, joint.Value.Position.Z + bonesize)
+                    Gl.End()
+                Next
+
+                c(body, JointType.SpineBase, JointType.SpineMid)
+                c(body, JointType.SpineMid, JointType.SpineShoulder)
+                c(body, JointType.SpineShoulder, JointType.Neck)
+                c(body, JointType.Neck, JointType.Head)
+                c(body, JointType.SpineBase, JointType.HipRight)
+                c(body, JointType.SpineBase, JointType.HipLeft)
+                c(body, JointType.HipLeft, JointType.KneeLeft)
+                c(body, JointType.HipRight, JointType.KneeRight)
+                c(body, JointType.KneeLeft, JointType.AnkleLeft)
+                c(body, JointType.KneeRight, JointType.AnkleRight)
+                c(body, JointType.AnkleLeft, JointType.FootLeft)
+                c(body, JointType.AnkleRight, JointType.FootRight)
+                c(body, JointType.SpineShoulder, JointType.ShoulderLeft)
+                c(body, JointType.SpineShoulder, JointType.ShoulderRight)
+                c(body, JointType.ShoulderLeft, JointType.ElbowLeft)
+                c(body, JointType.ShoulderRight, JointType.ElbowRight)
+                c(body, JointType.ElbowLeft, JointType.WristLeft)
+                c(body, JointType.ElbowRight, JointType.WristRight)
+                c(body, JointType.WristLeft, JointType.HandLeft)
+                c(body, JointType.WristRight, JointType.HandRight)
+                c(body, JointType.HandLeft, JointType.HandTipLeft)
+                c(body, JointType.HandRight, JointType.HandTipRight)
+                c(body, JointType.WristLeft, JointType.ThumbLeft)
+                c(body, JointType.WristRight, JointType.ThumbRight)
+
+
+                bodyCount += 1
+            Next
+        End If
+
+
+        Gl.Begin(PrimitiveType.LineStrip)
         Gl.Color3(1.0F, 0.0F, 0.0F)
-        For Each joint In trackedJoints
-            Gl.Vertex3(joint.Position.X, joint.Position.Y, joint.Position.Z)
-        Next
-
-
+        Gl.Vertex3(0F, 0F, 0F)
+        Gl.Vertex3(1.0F, 0F, 0F)
         Gl.End()
+
+        Gl.Begin(PrimitiveType.LineStrip)
+        Gl.Color3(0.0F, 1.0F, 0.0F)
+        Gl.Vertex3(0F, 0F, 0F)
+        Gl.Vertex3(0F, 1.0F, 0F)
+        Gl.End()
+
+        Gl.Begin(PrimitiveType.LineStrip)
+        Gl.Color3(0.0F, 0.0F, 1.0F)
+        Gl.Vertex3(0F, 0F, 0F)
+        Gl.Vertex3(0F, 0F, 1.0F)
+        Gl.End()
+    End Sub
+
+    Private Sub Form1_KeyDown(sender As Object, e As KeyEventArgs) Handles MyBase.KeyDown
+        Select Case e.KeyCode
+            Case Keys.W
+                z += 0.1
+            Case Keys.S
+                z -= 0.1
+            Case Keys.A
+                x += 0.1
+            Case Keys.D
+                x -= 0.1
+            Case Keys.R
+                y += 0.1
+            Case Keys.F
+                y -= 0.1
+        End Select
+        updateCoordinates()
+        glControl.Invalidate()
+    End Sub
+
+    Private Sub txtBoneSize_TextChanged(sender As Object, e As EventArgs) Handles txtBoneSize.TextChanged
+        bonesize = txtBoneSize.Text
+    End Sub
+
+    Private Sub btnDisconnect_Click(sender As Object, e As EventArgs) Handles btnDisconnect.Click
+        kSensor.Close()
     End Sub
 End Class
