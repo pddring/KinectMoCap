@@ -17,8 +17,6 @@ Public Class Form1
     Dim bmpDepth As Bitmap = Nothing
     Dim bmpIR As Bitmap = Nothing
 
-
-
     Dim glControl As OpenGL.GlControl
 
     Private Sub btnTest_Click(sender As Object, e As EventArgs) Handles btnTest.Click
