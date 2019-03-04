@@ -1,5 +1,8 @@
 ﻿Imports System.Net
+Imports System.Net.Sockets
 Imports System.Runtime.InteropServices
+Imports System.Text
+Imports System.Threading
 Imports Microsoft.Kinect
 Imports OpenGL
 
@@ -55,6 +58,8 @@ Public Class Form1
         kSensor.Open()
     End Sub
 
+    Dim bestTrackedBodyIndex As Integer = 0
+
 
     Private Sub BodyFrameHandler(sender As Object, e As BodyFrameArrivedEventArgs)
         Using frame As BodyFrame = e.FrameReference.AcquireFrame
@@ -72,6 +77,7 @@ Public Class Form1
 
             Dim title As String = "Bodies: " & frame.BodyCount & " "
 
+            Dim highestTracked As Integer = 0
             For i = 0 To bodies.Count - 1
 
                 Dim total As Integer = 0
@@ -80,11 +86,12 @@ Public Class Form1
                     If joint.Value.TrackingState = TrackingState.Tracked Then
                         total += 1
                     End If
-                    If Not lstJoints.Items.Contains(joint.Key) Then
-                        lstJoints.Items.Add(joint.Key)
-                    End If
 
                 Next
+                If total > highestTracked Then
+                    highestTracked = total
+                    bestTrackedBodyIndex = i
+                End If
                 title &= total & " "
             Next
 
@@ -186,10 +193,12 @@ Public Class Form1
             txtIP.Text &= address.ToString & vbNewLine
         Next
 
-        Dim s As IPEndPoint = New IPEndPoint(IPAddress.Any, 0)
-        Dim da
+        serverThread = New Thread(New ThreadStart(AddressOf serverThreadCode))
+        serverThread.Start()
 
     End Sub
+
+    Protected serverThread As Thread
 
     Private Sub Form1_Shown(sender As Object, e As EventArgs) Handles MyBase.Shown
         glControl = New OpenGL.GlControl()
@@ -316,5 +325,55 @@ Public Class Form1
 
     Private Sub btnDisconnect_Click(sender As Object, e As EventArgs) Handles btnDisconnect.Click
         kSensor.Close()
+    End Sub
+
+    Private Sub btnClientTest_Click(sender As Object, e As EventArgs) Handles btnClientTest.Click
+        Dim udpClient As New UdpClient
+
+        Dim server As New IPEndPoint(New IPAddress({127, 0, 0, 1}), 3456)
+        udpClient.Connect(server)
+        Dim txBuffer As Byte() = Encoding.UTF8.GetBytes("GETJOINTS")
+        udpClient.Send(txBuffer, txBuffer.Length)
+
+        Dim rxBuffer As Byte() = udpClient.Receive(server)
+        txtClientTest.Text = Encoding.UTF8.GetString(rxBuffer)
+
+    End Sub
+
+    Public Sub serverThreadCode()
+
+        While True
+            Using udpClient As New UdpClient(3456)
+                Dim remoteIpEndPoint As New IPEndPoint(IPAddress.Any, 0)
+                Dim buffer As Byte()
+                buffer = udpClient.Receive(remoteIpEndPoint)
+                Dim response As String = Encoding.UTF8.GetString(buffer)
+
+                lstLog.BeginInvoke(Sub()
+                                       lstLog.Items.Add(response & " from " & remoteIpEndPoint.ToString)
+                                   End Sub)
+
+                'TODO deal with response
+                Dim txBuffer As Byte() = Encoding.UTF8.GetBytes(GetJointData(bestTrackedBodyIndex))
+                udpClient.Connect(remoteIpEndPoint)
+                udpClient.Send(txBuffer, txBuffer.Length)
+            End Using
+        End While
+    End Sub
+
+    Public Function GetJointData(bodyIndex As Integer) As String
+        Dim data As String = "Not connected"
+        If Not IsNothing(bodies) Then
+            data = "Body " & bodyIndex & vbNewLine
+            For Each joint In bodies(bodyIndex).Joints
+                data &= joint.Key.ToString & ": " & joint.Value.Position.X & "," & joint.Value.Position.Y & "," & joint.Value.Position.Z & vbNewLine
+            Next
+        End If
+        Return data
+
+    End Function
+
+    Private Sub Form1_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
+
     End Sub
 End Class

@@ -34,9 +34,11 @@ Partial Class Form1
         Me.Label1 = New System.Windows.Forms.Label()
         Me.txtBoneSize = New System.Windows.Forms.TextBox()
         Me.btnDisconnect = New System.Windows.Forms.Button()
-        Me.lstJoints = New System.Windows.Forms.ListBox()
         Me.txtIP = New System.Windows.Forms.TextBox()
         Me.Label2 = New System.Windows.Forms.Label()
+        Me.txtClientTest = New System.Windows.Forms.TextBox()
+        Me.btnClientTest = New System.Windows.Forms.Button()
+        Me.lstLog = New System.Windows.Forms.ListBox()
         Me.GroupBox1.SuspendLayout()
         CType(Me.picDepth, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.GroupBox2.SuspendLayout()
@@ -158,14 +160,6 @@ Partial Class Form1
         Me.btnDisconnect.Text = "Disconnect"
         Me.btnDisconnect.UseVisualStyleBackColor = True
         '
-        'lstJoints
-        '
-        Me.lstJoints.FormattingEnabled = True
-        Me.lstJoints.Location = New System.Drawing.Point(30, 322)
-        Me.lstJoints.Name = "lstJoints"
-        Me.lstJoints.Size = New System.Drawing.Size(172, 108)
-        Me.lstJoints.TabIndex = 10
-        '
         'txtIP
         '
         Me.txtIP.Location = New System.Drawing.Point(45, 202)
@@ -183,14 +177,41 @@ Partial Class Form1
         Me.Label2.TabIndex = 12
         Me.Label2.Text = "IP"
         '
+        'txtClientTest
+        '
+        Me.txtClientTest.Location = New System.Drawing.Point(816, 43)
+        Me.txtClientTest.Multiline = True
+        Me.txtClientTest.Name = "txtClientTest"
+        Me.txtClientTest.Size = New System.Drawing.Size(301, 388)
+        Me.txtClientTest.TabIndex = 13
+        '
+        'btnClientTest
+        '
+        Me.btnClientTest.Location = New System.Drawing.Point(816, 12)
+        Me.btnClientTest.Name = "btnClientTest"
+        Me.btnClientTest.Size = New System.Drawing.Size(92, 25)
+        Me.btnClientTest.TabIndex = 14
+        Me.btnClientTest.Text = "Test client"
+        Me.btnClientTest.UseVisualStyleBackColor = True
+        '
+        'lstLog
+        '
+        Me.lstLog.FormattingEnabled = True
+        Me.lstLog.Location = New System.Drawing.Point(28, 334)
+        Me.lstLog.Name = "lstLog"
+        Me.lstLog.Size = New System.Drawing.Size(205, 95)
+        Me.lstLog.TabIndex = 15
+        '
         'Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(800, 450)
+        Me.ClientSize = New System.Drawing.Size(1135, 450)
+        Me.Controls.Add(Me.lstLog)
+        Me.Controls.Add(Me.btnClientTest)
+        Me.Controls.Add(Me.txtClientTest)
         Me.Controls.Add(Me.Label2)
         Me.Controls.Add(Me.txtIP)
-        Me.Controls.Add(Me.lstJoints)
         Me.Controls.Add(Me.btnDisconnect)
         Me.Controls.Add(Me.txtBoneSize)
         Me.Controls.Add(Me.Label1)
@@ -227,7 +248,9 @@ Partial Class Form1
     Friend WithEvents Label1 As Label
     Friend WithEvents txtBoneSize As TextBox
     Friend WithEvents btnDisconnect As Button
-    Friend WithEvents lstJoints As ListBox
     Friend WithEvents txtIP As TextBox
     Friend WithEvents Label2 As Label
+    Friend WithEvents txtClientTest As TextBox
+    Friend WithEvents btnClientTest As Button
+    Friend WithEvents lstLog As ListBox
 End Class
