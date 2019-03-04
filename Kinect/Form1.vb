@@ -13,6 +13,8 @@ Public Class Form1
     Dim irReader As InfraredFrameReader
     Dim bodyReader As BodyFrameReader
 
+    Dim sampleData As String
+
     Dim pixelBuffer As Byte() = Nothing
     Dim depthBuffer As UShort() = Nothing
     Dim irBuffer As UShort() = Nothing
@@ -185,6 +187,8 @@ Public Class Form1
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         updateCoordinates()
+
+        sampleData = My.Computer.FileSystem.ReadAllText("SampleJoints.txt")
 
         Dim hostname As String = Dns.GetHostName
         Dim ipEntry As IPHostEntry = Dns.GetHostEntry(hostname)
@@ -363,7 +367,10 @@ Public Class Form1
 
     Public Function GetJointData(bodyIndex As Integer) As String
         Dim data As String = "Not connected"
-        If Not IsNothing(bodies) Then
+        ' sending sample data
+        If IsNothing(bodies) Then
+            data = sampleData
+        Else
             data = "Body " & bodyIndex & vbNewLine
             For Each joint In bodies(bodyIndex).Joints
                 data &= joint.Key.ToString & ": " & joint.Value.Position.X & "," & joint.Value.Position.Y & "," & joint.Value.Position.Z & vbNewLine
@@ -374,6 +381,6 @@ Public Class Form1
     End Function
 
     Private Sub Form1_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
-
+        serverThread.Abort()
     End Sub
 End Class
