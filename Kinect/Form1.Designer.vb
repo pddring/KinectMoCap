@@ -35,6 +35,8 @@ Partial Class Form1
         Me.txtBoneSize = New System.Windows.Forms.TextBox()
         Me.btnDisconnect = New System.Windows.Forms.Button()
         Me.lstJoints = New System.Windows.Forms.ListBox()
+        Me.txtIP = New System.Windows.Forms.TextBox()
+        Me.Label2 = New System.Windows.Forms.Label()
         Me.GroupBox1.SuspendLayout()
         CType(Me.picDepth, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.GroupBox2.SuspendLayout()
@@ -164,11 +166,30 @@ Partial Class Form1
         Me.lstJoints.Size = New System.Drawing.Size(172, 108)
         Me.lstJoints.TabIndex = 10
         '
+        'txtIP
+        '
+        Me.txtIP.Location = New System.Drawing.Point(45, 202)
+        Me.txtIP.Multiline = True
+        Me.txtIP.Name = "txtIP"
+        Me.txtIP.Size = New System.Drawing.Size(189, 56)
+        Me.txtIP.TabIndex = 11
+        '
+        'Label2
+        '
+        Me.Label2.AutoSize = True
+        Me.Label2.Location = New System.Drawing.Point(11, 219)
+        Me.Label2.Name = "Label2"
+        Me.Label2.Size = New System.Drawing.Size(17, 13)
+        Me.Label2.TabIndex = 12
+        Me.Label2.Text = "IP"
+        '
         'Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(800, 450)
+        Me.Controls.Add(Me.Label2)
+        Me.Controls.Add(Me.txtIP)
         Me.Controls.Add(Me.lstJoints)
         Me.Controls.Add(Me.btnDisconnect)
         Me.Controls.Add(Me.txtBoneSize)
@@ -207,4 +228,6 @@ Partial Class Form1
     Friend WithEvents txtBoneSize As TextBox
     Friend WithEvents btnDisconnect As Button
     Friend WithEvents lstJoints As ListBox
+    Friend WithEvents txtIP As TextBox
+    Friend WithEvents Label2 As Label
 End Class

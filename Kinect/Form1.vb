@@ -1,4 +1,5 @@
-﻿Imports System.Runtime.InteropServices
+﻿Imports System.Net
+Imports System.Runtime.InteropServices
 Imports Microsoft.Kinect
 Imports OpenGL
 
@@ -177,6 +178,17 @@ Public Class Form1
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         updateCoordinates()
+
+        Dim hostname As String = Dns.GetHostName
+        Dim ipEntry As IPHostEntry = Dns.GetHostEntry(hostname)
+
+        For Each address In ipEntry.AddressList
+            txtIP.Text &= address.ToString & vbNewLine
+        Next
+
+        Dim s As IPEndPoint = New IPEndPoint(IPAddress.Any, 0)
+        Dim da
+
     End Sub
 
     Private Sub Form1_Shown(sender As Object, e As EventArgs) Handles MyBase.Shown
